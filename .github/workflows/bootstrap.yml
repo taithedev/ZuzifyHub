@@ -51,7 +51,8 @@ jobs:
 
           # Bootstrap payload is temporary; the final repository contains readable source.
           Path(".bootstrap/source.tar.xz.b64").unlink()
-          Path(".github/workflows/bootstrap.yml").unlink()
+          # GitHub Actions tokens cannot add or delete workflow files.
+          Path(".github/workflows/build-windows.yml").unlink()
           Path(".bootstrap").rmdir()
           print("Restored the complete React/Tauri application source.")
           '@ | python -

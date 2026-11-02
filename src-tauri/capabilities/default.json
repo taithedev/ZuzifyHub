@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "The Zuzify Hub main window uses core Tauri APIs and its registered native commands.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

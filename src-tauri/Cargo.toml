@@ -1,0 +1,28 @@
+[package]
+name = "zuzify-hub"
+version = "0.1.0"
+description = "Zuzify Hub desktop application manager"
+authors = ["Zuzify Inc."]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "zuzify_hub_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "stream"] }
+futures-util = "0.3"
+tokio = { version = "1", features = ["fs", "io-util"] }
+sha2 = "0.10"
+dirs = "6"
+url = "2"
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55"

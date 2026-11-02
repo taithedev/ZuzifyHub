@@ -177,11 +177,11 @@ async fn get_available_releases() -> Vec<ReleaseInfo> {
             if let Some(asset) = best_asset(&release) {
                 available.push(ReleaseInfo {
                     id: (*id).into(),
-                    version: release.tag_name,
-                    name: release.name.unwrap_or_default(),
+                    version: release.tag_name.clone(),
+                    name: release.name.clone().unwrap_or_default(),
                     asset_name: asset.name.clone(),
                     size: asset.size,
-                    published_at: release.published_at,
+                    published_at: release.published_at.clone(),
                 });
             }
         }

@@ -133,8 +133,10 @@ fn http_client() -> Result<reqwest::Client, String> {
 
 fn windows_installer(asset: &GitHubAsset) -> bool {
     let lower = asset.name.to_ascii_lowercase();
+    // ZuzuCord publishes a verified NSIS setup exe without "setup" in its filename.
+    let zuzucord_nsis = lower.starts_with("zuzucord-react-") && lower.ends_with("-x64.exe");
     let ext_ok = lower.ends_with(".msi") || (lower.ends_with(".exe")
-        && (lower.contains("setup") || lower.contains("installer"))
+        && (lower.contains("setup") || lower.contains("installer") || zuzucord_nsis)
         && !lower.contains("uninstall"));
     // Windows desktop build currently supports x64 installers only.
     ext_ok && !lower.contains("arm64") && !lower.contains("aarch64") && !lower.contains("x86")
@@ -296,17 +298,17 @@ fn launch_installed_app(app_id: String) -> Result<(), String> {
         .ok_or("This app was not found in the Windows uninstall registry.")?;
     let location = installed.install_location.ok_or("Windows has no recorded install location for this app.")?;
     let folder = Path::new(&location);
-    let executable = match app_id.as_str() {
-        "zuzucord" => "ZuzuCord.exe",
-        "zuzuai" => "ZuzuAI.exe",
-        "vertexx" => "VertexX.exe",
-        "winglass" => "Winglass.exe",
-        "zuzuloader" => "ZuzuLoader.exe",
-        "cuteterm" => "CuteTerm.exe",
+    let executable_names: &[&str] = match app_id.as_str() {
+        "zuzucord" => &["ZuzuCord.exe", "ZuzuCord-React.exe"],
+        "zuzuai" => &["ZuzuAI.exe"],
+        "vertexx" => &["VertexX.exe"],
+        "winglass" => &["Winglass.exe"],
+        "zuzuloader" => &["ZuzuLoader.exe"],
+        "cuteterm" => &["CuteTerm.exe"],
         _ => return Err("No launch executable configured for this app.".into()),
     };
-    let path = folder.join(executable);
-    if !path.is_file() { return Err("The app is installed, but its launch executable was not found. Open it from the Windows Start menu or use Open folder.".into()); }
+    let path = executable_names.iter().map(|name| folder.join(name)).find(|candidate| candidate.is_file())
+        .ok_or("The app is installed, but its launch executable was not found. Open it from the Windows Start menu or use Open folder.")?;
     Command::new(path).current_dir(folder).spawn().map_err(|e| format!("Could not launch app: {e}"))?;
     Ok(())
 }
